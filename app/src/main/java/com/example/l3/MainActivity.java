@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         NetworkInfo activeNetworkInfo = manager.getActiveNetworkInfo();
         boolean tieneInternet = activeNetworkInfo != null && activeNetworkInfo.isConnected();
 
-        Log.d("msg-test-internet", "Internet: " + tieneInternet);
+        Log.d("msg-internet", "Internet: " + tieneInternet);
 
         return tieneInternet;
     }
