@@ -11,24 +11,22 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
-import com.example.l3.databinding.ActivityMainBinding;
 import com.example.l3.databinding.ActivityPrimoBinding;
 import com.example.l3.dto.Numeros;
-import com.example.l3.dto.Numeros;
+import com.example.l3.dto.viewmodel.PrimoViewModel;
 import com.example.l3.services.TypicodeService;
+import com.example.l3.worker.ThreadWorker;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,8 +46,6 @@ public class PrimoActivity extends AppCompatActivity {
 
         Toast.makeText(getApplicationContext(), "Ingresó a la vista de números primos", Toast.LENGTH_SHORT).show();
 
-        ApplicationThreads application = (ApplicationThreads) getApplication();
-
         typicodeService = new Retrofit.Builder()
                 .baseUrl("https://prime-number-api.onrender.com")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -62,9 +58,61 @@ public class PrimoActivity extends AppCompatActivity {
         buttonBuscar.setOnClickListener(v ->
                 buscarPrimo()
         );
-        buttonASc.setOnClickListener(v ->
-                ascender()
-        );
+//        buttonASc.setOnClickListener(v ->
+//                ascenderWorker()
+//        );
+
+        // Usando ExecutorService
+        ApplicationThreads application = (ApplicationThreads) getApplication();
+        ExecutorService executorService = application.executorService;
+        // **********************
+
+        PrimoViewModel primoViewModel =
+                new ViewModelProvider(PrimoActivity.this).get(PrimoViewModel.class);
+
+        primoViewModel.getContador().observe(this, contador -> {
+            //actualización del textView con los valores parciales de contador
+            binding.tvthread.setText(String.valueOf(contador));
+        });
+
+        binding.buttonAsc.setOnClickListener(view -> {
+
+            //es un hilo en background
+            executorService.execute(() -> {
+
+                typicodeService = new Retrofit.Builder()
+                        .baseUrl("https://prime-number-api.onrender.com")
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build()
+                        .create(TypicodeService.class);
+
+                typicodeService.getNumeros().enqueue(new Callback<List<Numeros>>() {
+                    @Override
+                    public void onResponse(Call<List<Numeros>> call, Response<List<Numeros>> response) {
+                        if(response.isSuccessful()){
+                            List<Numeros> numeros = response.body();
+
+                            for(Numeros n : numeros){
+                                Toast.makeText(getApplicationContext(), n.getNumber(), Toast.LENGTH_SHORT).show();
+                                primoViewModel.getContador().postValue(n.getNumber());
+                                try {
+                                    Thread.sleep(100);
+                                } catch (InterruptedException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<List<Numeros>> call, Throwable t) {
+                        t.printStackTrace();
+                    }
+                });
+
+            });
+
+        });
 
 
     }
@@ -104,7 +152,7 @@ public class PrimoActivity extends AppCompatActivity {
         }
     }
 
-    public void ascender(){
+    public void ascenderWorker(){
         if (tengoInternet1()){
             UUID uuid = UUID.randomUUID();
 
@@ -132,6 +180,34 @@ public class PrimoActivity extends AppCompatActivity {
 
         }
     }
+//public void ascenderVM(){
+//        if (tengoInternet1()){
+//            UUID uuid = UUID.randomUUID();
+//
+//            WorkRequest workRequest = new OneTimeWorkRequest.Builder(ThreadWorker.class)
+//                    .setId(uuid)
+//                    .build();
+//
+//            WorkManager
+//                    .getInstance(PrimoActivity.this.getApplicationContext())
+//                    .enqueue(workRequest);
+//
+//            WorkManager
+//                    .getInstance(binding.getRoot().getContext())
+//                    .getWorkInfoByIdLiveData(uuid)
+//                    .observe(PrimoActivity.this, workInfo -> {
+//                        if(workInfo != null){
+//                            Data progress = workInfo.getProgress();
+//                            String contador = progress.getString("contador");
+//                            Log.d("msg-test-progress", "progress: " + contador);
+//                            binding.tvthread.setText(String.valueOf(contador));
+//                        }else{
+//                            Log.d("msg-test", "work info == null ");
+//                        }
+//                    });
+//
+//        }
+//    }
 
 
 

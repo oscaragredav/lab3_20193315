@@ -13,6 +13,10 @@ public interface TypicodeService {
     @GET("/primeNumbers?len=999&order=1")
     Call<List<Numeros>> getNumeros();
 
+//      para  orden inverso
+//    @GET("/primeNumbers?len=999&order=-1&max=999&type=order")
+//    Call<List<Numeros>> getNumeros();
+
     @GET("/?apikey=bf81d461&i=tt3896198")
     Call<Peliculas> getPeliculas();
 }

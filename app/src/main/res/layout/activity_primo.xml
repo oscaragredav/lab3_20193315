@@ -37,9 +37,8 @@
         android:layout_marginTop="24dp"
         android:backgroundTint="#F3DC10"
         android:fontFamily="@font/alfa_slab_one"
-        android:text="Buscar"
         android:textColor="#000000"
-        android:textColorHint="#000000"
+        android:text="Buscar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editText" />
@@ -64,7 +63,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="144dp"
-        android:text="TextView"
+        android:text="0"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -74,11 +73,26 @@
         android:id="@+id/buttonAsc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="60dp"
         android:layout_marginTop="16dp"
-        android:text="Button"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:backgroundTint="#F3DC10"
+        android:fontFamily="@font/alfa_slab_one"
+        android:textColor="#000000"
+        android:text="Ascendente"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvthread" />
+
+    <Button
+        android:id="@+id/Desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="60dp"
+        android:backgroundTint="#F3DC10"
+        android:fontFamily="@font/alfa_slab_one"
+        android:textColor="#000000"
+        android:text="Descendente"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/buttonAsc" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
